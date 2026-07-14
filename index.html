@@ -100,10 +100,10 @@
     margin-bottom: 10px;
   }
 
-  /* Stretch keeps all four cards equal height; inputs pin to the bottom */
+  /* Stretch keeps all cards equal height; inputs pin to the bottom */
   .inputs-grid {
     display: grid;
-    grid-template-columns: 1fr 1.18fr 1.18fr 1fr;
+    grid-template-columns: 1fr 1.4fr 1fr;
     gap: 10px;
     margin-bottom: 12px;
     align-items: stretch;
@@ -112,6 +112,7 @@
   @media (max-width: 560px) {
     .inputs-grid { grid-template-columns: 1fr 1fr; }
     .input-card label { min-height: 2.9em !important; }
+    .input-card:last-child { grid-column: 1 / -1; }
   }
   @media (max-width: 500px) {
     .inputs-grid { grid-template-columns: 1fr; }
@@ -144,8 +145,6 @@
     margin-bottom: 8px;
   }
   .input-card label strong { font-weight: 700; }
-  .lbl-process { color: #00B6C7; }
-  .lbl-relationship { color: #7CEA9C; }
 
   .input-wrap {
     position: relative;
@@ -387,6 +386,8 @@
     line-height: 1.5;
   }
 
+  .print-qr { display: none; }
+
   @media print {
     body { background: #fff; padding: 0; display: block; }
     .card {
@@ -424,11 +425,20 @@
     .result-val.annual, .peruser-val.annual { color: #7a5d00; }
     .peruser-cell + .peruser-cell { border-left-color: #e2e6ea; }
     .peruser-label { color: #5a6470; }
-    .lbl-process { color: #007a86; }
-    .lbl-relationship { color: #1e7a41; }
     .balance-note { background: #fdf8e7; border-color: #e0c96a; color: #3a4450; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
     .balance-note strong { color: #7a5d00; }
     .footnote { color: #8a94a0; }
+    .print-qr {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 14px;
+      margin-top: 20px;
+    }
+    .print-qr-code { width: 90px; height: 90px; flex-shrink: 0; }
+    .print-qr-code svg { width: 100%; height: 100%; display: block; }
+    .print-qr-title { font-size: 11px; font-weight: 700; color: #0a1d33; margin-bottom: 2px; }
+    .print-qr-url { font-size: 10.5px; color: #5a6470; }
   }
 </style>
 </head>
@@ -458,15 +468,9 @@
       </div>
     </div>
     <div class="input-card">
-      <label for="process"><strong class="lbl-process">Process-driven</strong> touchpoints (per user, per week)</label>
+      <label for="touchpoints">Touchpoints (per user, per week)</label>
       <div class="input-wrap">
-        <input type="number" id="process" placeholder="0" min="0" step="any" oninput="onInput()" aria-label="Process-driven touchpoints per user per week" />
-      </div>
-    </div>
-    <div class="input-card">
-      <label for="relationship"><strong class="lbl-relationship">Relationship-driven</strong> touchpoints (per user, per week)</label>
-      <div class="input-wrap">
-        <input type="number" id="relationship" placeholder="0" min="0" step="any" oninput="onInput()" aria-label="Relationship-driven touchpoints per user per week" />
+        <input type="number" id="touchpoints" placeholder="0" min="0" step="any" oninput="onInput()" aria-label="Touchpoints per user per week" />
       </div>
     </div>
     <div class="input-card">
@@ -481,7 +485,7 @@
   <details class="explainer" id="explainer">
     <summary>
       <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 3 11 8 6 13"/></svg>
-      What counts as process vs relationship?
+      Need examples of touchpoints? See what counts as process vs. relationship.
     </summary>
     <div class="explainer-cols">
       <div class="explainer-block">
@@ -588,12 +592,20 @@
     </button>
   </div>
 
-  <div class="footnote">Thnks sent = users x (process + relationship touchpoints). Spend = Thnks sent x average gesture value.</div>
+  <div class="print-qr" aria-hidden="true">
+    <div class="print-qr-code"><svg viewBox="0 0 31 31" class="segno"><path class="qrline" stroke="#0a1d33" d="M1 1.5h7m1 0h2m2 0h1m1 0h3m1 0h1m1 0h1m1 0h7m-29 1h1m5 0h1m1 0h1m2 0h2m4 0h1m1 0h1m2 0h1m5 0h1m-29 1h1m1 0h3m1 0h1m1 0h2m1 0h2m2 0h2m1 0h1m3 0h1m1 0h3m1 0h1m-29 1h1m1 0h3m1 0h1m5 0h1m3 0h2m2 0h1m1 0h1m1 0h3m1 0h1m-29 1h1m1 0h3m1 0h1m1 0h1m1 0h1m3 0h2m2 0h2m2 0h1m1 0h3m1 0h1m-29 1h1m5 0h1m2 0h2m1 0h1m9 0h1m5 0h1m-29 1h7m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h7m-18 1h3m1 0h2m1 0h2m-20 1h1m2 0h7m1 0h3m2 0h2m3 0h1m2 0h1m1 0h3m-29 1h1m1 0h4m2 0h3m1 0h2m1 0h2m1 0h2m1 0h1m1 0h2m1 0h2m-26 1h2m1 0h5m1 0h3m1 0h1m1 0h1m3 0h1m4 0h1m-26 1h3m1 0h1m1 0h4m2 0h1m2 0h2m3 0h1m1 0h1m1 0h1m2 0h1m-28 1h1m2 0h1m1 0h5m1 0h2m1 0h1m3 0h2m1 0h2m4 0h1m-29 1h6m2 0h3m1 0h5m4 0h8m-25 1h1m1 0h2m1 0h1m1 0h3m1 0h2m2 0h4m3 0h1m1 0h1m-28 1h3m4 0h1m1 0h2m4 0h1m1 0h4m1 0h1m2 0h1m1 0h1m-29 1h1m1 0h1m2 0h3m3 0h1m2 0h3m3 0h1m2 0h1m1 0h1m-26 1h2m1 0h1m1 0h1m1 0h1m1 0h3m1 0h3m2 0h4m2 0h1m1 0h2m-28 1h2m1 0h2m1 0h1m4 0h1m3 0h1m1 0h1m1 0h7m2 0h1m-29 1h2m1 0h1m1 0h1m1 0h2m1 0h1m3 0h1m3 0h2m5 0h2m-27 1h3m2 0h2m1 0h1m2 0h7m1 0h9m-20 1h4m2 0h2m1 0h2m1 0h1m3 0h2m-26 1h7m1 0h2m2 0h1m1 0h2m1 0h4m1 0h1m1 0h2m-26 1h1m5 0h1m1 0h2m1 0h1m2 0h2m1 0h1m1 0h2m3 0h1m2 0h1m-28 1h1m1 0h3m1 0h1m1 0h1m1 0h2m1 0h2m1 0h1m2 0h7m1 0h2m-29 1h1m1 0h3m1 0h1m1 0h1m1 0h3m2 0h1m2 0h2m1 0h1m6 0h1m-29 1h1m1 0h3m1 0h1m2 0h1m2 0h4m1 0h1m2 0h2m1 0h2m1 0h3m-29 1h1m5 0h1m2 0h1m1 0h3m2 0h1m1 0h1m2 0h2m1 0h3m1 0h1m-29 1h7m1 0h7m1 0h1m2 0h2m3 0h2"/></svg></div>
+    <div class="print-qr-text">
+      <div class="print-qr-title">See it live and try your own numbers</div>
+      <div class="print-qr-url">thnksspendcalc.netlify.app</div>
+    </div>
+  </div>
+
+  <div class="footnote">Thnks sent = users x touchpoints (process + relationship driven). Spend = Thnks sent x average gesture value.</div>
 </div>
 
 <script>
-  var DEFAULTS = { users: '', process: '', relationship: '', avg: 10 };
-  var PARAM_KEYS = { u: 'users', p: 'process', r: 'relationship', v: 'avg' };
+  var DEFAULTS = { users: '', touchpoints: '', avg: 10 };
+  var PARAM_KEYS = { u: 'users', t: 'touchpoints', v: 'avg' };
   var RESULT_IDS = ['t-week', 't-month', 't-quarter', 't-year',
                     'c-week', 'c-month', 'c-quarter', 'c-year',
                     'pu-month', 'pu-year'];
@@ -608,13 +620,12 @@
 
   function calc() {
     var users = num('users');
-    var proc  = num('process');
-    var rel   = num('relationship');
+    var tp    = num('touchpoints');
     var avg   = num('avg');
 
     // Unrounded weekly base; every period derives from it on a 52-week year,
     // so monthly x 12 = quarterly x 4 = annual exactly.
-    var tWeek    = users * (proc + rel);
+    var tWeek    = users * tp;
     var tMonth   = tWeek * (52 / 12);
     var tQuarter = tWeek * 13;
     var tYear    = tWeek * 52;
