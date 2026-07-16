@@ -115,6 +115,10 @@
     .input-card label { min-height: 2.9em !important; }
     .input-card:last-child { grid-column: 1 / -1; }
   }
+  @media (min-width: 700px) {
+    body { zoom: 1.6; }
+  }
+
   @media (max-width: 500px) {
     .inputs-grid { grid-template-columns: 1fr; }
     .input-card label { min-height: 0 !important; }
@@ -196,12 +200,13 @@
     align-items: center;
     gap: 5px;
     font-size: 10.5px;
-    font-weight: 700;
+    font-weight: 500;
     color: rgba(255,255,255,0.5);
     transition: color 0.15s;
     -webkit-user-select: none;
     user-select: none;
   }
+  .explainer summary strong { font-weight: 700; }
   .explainer summary::-webkit-details-marker { display: none; }
   .explainer summary:hover { color: rgba(255,255,255,0.6); }
   .explainer summary svg {
@@ -380,13 +385,6 @@
     margin-bottom: 1.1rem;
   }
 
-  .footnote {
-    font-size: 10.5px;
-    color: rgba(255,255,255,0.22);
-    text-align: center;
-    line-height: 1.5;
-  }
-
   .print-qr { display: none; }
 
   @media print {
@@ -428,7 +426,6 @@
     .peruser-label { color: #5a6470; }
     .balance-note { background: #fdf8e7; border-color: #e0c96a; color: #3a4450; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
     .balance-note strong { color: #7a5d00; }
-    .footnote { color: #8a94a0; }
     .print-qr {
       display: flex;
       align-items: center;
@@ -469,7 +466,7 @@
       </div>
     </div>
     <div class="input-card">
-      <label for="touchpoints">Touchpoints (per user, per week)</label>
+      <label for="touchpoints"><strong>Touchpoints</strong> (per user, per week)</label>
       <div class="input-wrap">
         <input type="number" id="touchpoints" placeholder="0" min="0" step="any" oninput="onInput()" aria-label="Touchpoints per user per week" />
       </div>
@@ -478,15 +475,15 @@
       <label for="avg">Average gesture value</label>
       <div class="input-wrap">
         <span class="input-prefix">$</span>
-        <input type="number" id="avg" value="10" min="0" step="any" class="has-prefix" oninput="onInput()" aria-label="Average gesture value in dollars" />
+        <input type="number" id="avg" placeholder="0" min="0" step="any" class="has-prefix" oninput="onInput()" aria-label="Average gesture value in dollars" />
       </div>
     </div>
   </div>
 
-  <details class="explainer" id="explainer">
+  <details class="explainer" id="explainer" open>
     <summary>
       <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 3 11 8 6 13"/></svg>
-      Need examples of touchpoints? See what counts as process vs. relationship.
+      Need examples of <strong>touchpoints</strong>? See what counts as process vs. relationship.
     </summary>
     <div class="explainer-cols">
       <div class="explainer-block">
@@ -511,6 +508,24 @@
   <hr class="divider" />
 
   <h2 class="section-label">Results</h2>
+
+  <div class="peruser" aria-live="polite">
+    <h3 class="result-col-title">
+      <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="8" cy="5" r="3"/><path d="M2.5 14a5.5 5.5 0 0 1 11 0"/></svg>
+      Per-User Budget
+    </h3>
+    <div class="peruser-cells">
+      <div class="peruser-cell">
+        <div class="peruser-label">Monthly per user</div>
+        <div class="peruser-val" id="pu-month">&mdash;</div>
+      </div>
+      <div class="peruser-cell">
+        <div class="peruser-label">Annual per user</div>
+        <div class="peruser-val annual" id="pu-year">&mdash;</div>
+      </div>
+    </div>
+  </div>
+
   <div class="results-grid" aria-live="polite">
 
     <div class="result-col">
@@ -561,23 +576,6 @@
 
   </div>
 
-  <div class="peruser" aria-live="polite">
-    <h3 class="result-col-title">
-      <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="8" cy="5" r="3"/><path d="M2.5 14a5.5 5.5 0 0 1 11 0"/></svg>
-      Per-User Budget
-    </h3>
-    <div class="peruser-cells">
-      <div class="peruser-cell">
-        <div class="peruser-label">Monthly per user</div>
-        <div class="peruser-val" id="pu-month">&mdash;</div>
-      </div>
-      <div class="peruser-cell">
-        <div class="peruser-label">Annual per user</div>
-        <div class="peruser-val annual" id="pu-year">&mdash;</div>
-      </div>
-    </div>
-  </div>
-
   <div class="balance-note">
     <strong>Your commitment isn&rsquo;t a fee.</strong> It&rsquo;s your team&rsquo;s balance, fully available to spend on Thnks.
   </div>
@@ -601,11 +599,10 @@
     </div>
   </div>
 
-  <div class="footnote">Thnks sent = users x touchpoints (process + relationship driven). Spend = Thnks sent x average gesture value.</div>
 </div>
 
 <script>
-  var DEFAULTS = { users: '', touchpoints: '', avg: 10 };
+  var DEFAULTS = { users: '', touchpoints: '', avg: '' };
   var PARAM_KEYS = { u: 'users', t: 'touchpoints', v: 'avg' };
   var RESULT_IDS = ['t-week', 't-month', 't-quarter', 't-year',
                     'c-week', 'c-month', 'c-quarter', 'c-year',
