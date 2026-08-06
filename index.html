@@ -112,7 +112,6 @@
 
   @media (max-width: 560px) {
     .inputs-grid { grid-template-columns: 1fr 1fr; }
-    .input-card label { min-height: 2.9em !important; }
     .input-card:last-child { grid-column: 1 / -1; }
   }
   @media (min-width: 700px) {
@@ -189,6 +188,30 @@
   .input-card input::-webkit-inner-spin-button,
   .input-card input::-webkit-outer-spin-button { -webkit-appearance: none; }
   .input-card input[type=number] { -moz-appearance: textfield; }
+
+  .freq-toggle { display: flex; gap: 4px; margin-bottom: 8px; }
+  .freq-btn {
+    flex: 1;
+    font-family: 'Parkinsans', sans-serif;
+    font-size: 9.5px;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    text-align: center;
+    white-space: nowrap;
+    padding: 4px 2px;
+    border-radius: 20px;
+    background: transparent;
+    cursor: pointer;
+    appearance: none;
+    transition: background 0.15s, color 0.15s, border-color 0.15s;
+  }
+  .freq-btn[data-freq="week"]    { border: 0.5px solid rgba(0,182,199,0.35);   color: #00B6C7; }
+  .freq-btn[data-freq="month"]   { border: 0.5px solid rgba(240,201,72,0.35);  color: #F0C948; }
+  .freq-btn[data-freq="quarter"] { border: 0.5px solid rgba(124,234,156,0.35); color: #7CEA9C; }
+  .freq-btn:hover:not(.active) { background: rgba(255,255,255,0.08); }
+  .freq-btn.active { background: #00B6C7; border-color: #00B6C7; color: #05242b; }
+  .freq-btn:focus-visible { outline: 2px solid #00B6C7; outline-offset: 2px; }
 
   .explainer {
     margin-bottom: 1.5rem;
@@ -310,7 +333,7 @@
     background: rgba(0,182,199,0.07);
     border-radius: 8px;
     padding: 8px 8px;
-    margin: 4px -4px 0;
+    margin: 0 -4px 4px;
     border-bottom: none;
   }
 
@@ -398,7 +421,7 @@
     }
     .logo { color: #0a1d33; }
     .subtitle, .section-label, .result-col-title { color: #007a86; }
-    .reset-btn, .actions { display: none; }
+    .reset-btn, .actions, .freq-toggle { display: none; }
     .input-card { background: #fff; border-color: #d5dbe2; }
     .input-card label { color: #5a6470; }
     .input-card input { background: #fff; border-color: #b9c2cc; color: #7a5d00; }
@@ -466,7 +489,12 @@
       </div>
     </div>
     <div class="input-card">
-      <label for="touchpoints"><strong>Touchpoints</strong> (per user, per week)</label>
+      <label for="touchpoints"><strong>Touchpoints</strong> <span id="touchpoints-unit">(per user, per week)</span></label>
+      <div class="freq-toggle" role="group" aria-label="Touchpoint entry frequency">
+        <button type="button" class="freq-btn active" id="freq-week" data-freq="week" onclick="setFreq('week')" aria-pressed="true">Week</button>
+        <button type="button" class="freq-btn" id="freq-month" data-freq="month" onclick="setFreq('month')" aria-pressed="false">Month</button>
+        <button type="button" class="freq-btn" id="freq-quarter" data-freq="quarter" onclick="setFreq('quarter')" aria-pressed="false">Quarter</button>
+      </div>
       <div class="input-wrap">
         <input type="number" id="touchpoints" placeholder="0" min="0" step="any" oninput="onInput()" aria-label="Touchpoints per user per week" />
       </div>
@@ -483,7 +511,7 @@
   <details class="explainer" id="explainer">
     <summary>
       <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 3 11 8 6 13"/></svg>
-      Need examples of <strong>touchpoints</strong>? See what counts as process vs. relationship.
+      Need examples of touchpoints? <strong>Click here</strong> to see what counts as process vs. relationship.
     </summary>
     <div class="explainer-cols">
       <div class="explainer-block">
@@ -509,23 +537,6 @@
 
   <h2 class="section-label">Results</h2>
 
-  <div class="peruser" aria-live="polite">
-    <h3 class="result-col-title">
-      <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="8" cy="5" r="3"/><path d="M2.5 14a5.5 5.5 0 0 1 11 0"/></svg>
-      Per-User Budget
-    </h3>
-    <div class="peruser-cells">
-      <div class="peruser-cell">
-        <div class="peruser-label">Monthly per user</div>
-        <div class="peruser-val" id="pu-month">&mdash;</div>
-      </div>
-      <div class="peruser-cell">
-        <div class="peruser-label">Annual per user</div>
-        <div class="peruser-val annual" id="pu-year">&mdash;</div>
-      </div>
-    </div>
-  </div>
-
   <div class="results-grid" aria-live="polite">
 
     <div class="result-col">
@@ -533,21 +544,21 @@
         <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="2" y1="8" x2="14" y2="8"/><polyline points="9 3 14 8 9 13"/></svg>
         Thnks Sent
       </h3>
+      <div class="result-row annual-row">
+        <span class="period-pill pill-a">Annual</span>
+        <span class="result-val annual" id="t-year">&mdash;</span>
+      </div>
       <div class="result-row">
-        <span class="period-pill pill-w">Weekly</span>
-        <span class="result-val" id="t-week">&mdash;</span>
+        <span class="period-pill pill-q">Quarterly</span>
+        <span class="result-val" id="t-quarter">&mdash;</span>
       </div>
       <div class="result-row">
         <span class="period-pill pill-m">Monthly</span>
         <span class="result-val" id="t-month">&mdash;</span>
       </div>
       <div class="result-row">
-        <span class="period-pill pill-q">Quarterly</span>
-        <span class="result-val" id="t-quarter">&mdash;</span>
-      </div>
-      <div class="result-row annual-row">
-        <span class="period-pill pill-a">Annual</span>
-        <span class="result-val annual" id="t-year">&mdash;</span>
+        <span class="period-pill pill-w">Weekly</span>
+        <span class="result-val" id="t-week">&mdash;</span>
       </div>
     </div>
 
@@ -556,24 +567,41 @@
         <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="8" cy="8" r="6"/><line x1="8" y1="5" x2="8" y2="8"/><line x1="8" y1="8" x2="10.5" y2="10.5"/></svg>
         Spend Commitment
       </h3>
+      <div class="result-row annual-row">
+        <span class="period-pill pill-a">Annual</span>
+        <span class="result-val annual" id="c-year">&mdash;</span>
+      </div>
       <div class="result-row">
-        <span class="period-pill pill-w">Weekly</span>
-        <span class="result-val" id="c-week">&mdash;</span>
+        <span class="period-pill pill-q">Quarterly</span>
+        <span class="result-val" id="c-quarter">&mdash;</span>
       </div>
       <div class="result-row">
         <span class="period-pill pill-m">Monthly</span>
         <span class="result-val" id="c-month">&mdash;</span>
       </div>
       <div class="result-row">
-        <span class="period-pill pill-q">Quarterly</span>
-        <span class="result-val" id="c-quarter">&mdash;</span>
-      </div>
-      <div class="result-row annual-row">
-        <span class="period-pill pill-a">Annual</span>
-        <span class="result-val annual" id="c-year">&mdash;</span>
+        <span class="period-pill pill-w">Weekly</span>
+        <span class="result-val" id="c-week">&mdash;</span>
       </div>
     </div>
 
+  </div>
+
+  <div class="peruser" aria-live="polite">
+    <h3 class="result-col-title">
+      <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="8" cy="5" r="3"/><path d="M2.5 14a5.5 5.5 0 0 1 11 0"/></svg>
+      Per-User Budget
+    </h3>
+    <div class="peruser-cells">
+      <div class="peruser-cell">
+        <div class="peruser-label">Annual per user</div>
+        <div class="peruser-val annual" id="pu-year">&mdash;</div>
+      </div>
+      <div class="peruser-cell">
+        <div class="peruser-label">Monthly per user</div>
+        <div class="peruser-val" id="pu-month">&mdash;</div>
+      </div>
+    </div>
   </div>
 
   <div class="balance-note">
@@ -608,6 +636,13 @@
                     'c-week', 'c-month', 'c-quarter', 'c-year',
                     'pu-month', 'pu-year'];
 
+  var FREQ_DEFAULT = 'week';
+  var FREQ_MULT = { week: 52, month: 12, quarter: 4 };
+  var FREQ_CODE = { week: 'w', month: 'm', quarter: 'q' };
+  var CODE_FREQ = { w: 'week', m: 'month', q: 'quarter' };
+  var FREQ_BTN_IDS = { week: 'freq-week', month: 'freq-month', quarter: 'freq-quarter' };
+  var freq = FREQ_DEFAULT;
+
   function fmt(n) { return Math.round(n).toLocaleString('en-US'); }
   function fmtD(n) { return '$' + Math.round(n).toLocaleString('en-US'); }
   function num(id) {
@@ -621,14 +656,16 @@
     var tp    = num('touchpoints');
     var avg   = num('avg');
 
-    // Unrounded weekly base; every period derives from it on a 52-week year,
-    // so monthly x 12 = quarterly x 4 = annual exactly.
-    var tWeek    = users * tp;
-    var tMonth   = tWeek * (52 / 12);
-    var tQuarter = tWeek * 13;
-    var tYear    = tWeek * 52;
+    // Normalize whatever frequency was entered (week/month/quarter) to a
+    // single annual total, then derive every other period by dividing that
+    // ONE number -- never by multiplying a separately-rounded intermediate --
+    // so monthly x 12 = quarterly x 4 = annual, regardless of entry frequency.
+    var tYear    = users * tp * FREQ_MULT[freq];
+    var tQuarter = tYear / 4;
+    var tMonth   = tYear / 12;
+    var tWeek    = tYear / 52;
 
-    if (tWeek > 0) {
+    if (tYear > 0) {
       set('t-week',    fmt(tWeek));
       set('t-month',   fmt(tMonth));
       set('t-quarter', fmt(tQuarter));
@@ -654,6 +691,9 @@
         parts.push(key + '=' + encodeURIComponent(num(id)));
       }
     });
+    if (freq !== FREQ_DEFAULT) {
+      parts.push('f=' + FREQ_CODE[freq]);
+    }
     return parts.length ? '?' + parts.join('&') : '';
   }
 
@@ -666,6 +706,24 @@
     syncUrl();
   }
 
+  function applyFreqToDom() {
+    Object.keys(FREQ_BTN_IDS).forEach(function (key) {
+      var btn = document.getElementById(FREQ_BTN_IDS[key]);
+      var isActive = key === freq;
+      btn.classList.toggle('active', isActive);
+      btn.setAttribute('aria-pressed', isActive ? 'true' : 'false');
+    });
+    document.getElementById('touchpoints-unit').textContent = '(per user, per ' + freq + ')';
+    document.getElementById('touchpoints').setAttribute('aria-label', 'Touchpoints per user per ' + freq);
+  }
+
+  function setFreq(f) {
+    if (!FREQ_MULT.hasOwnProperty(f) || f === freq) return;
+    freq = f;
+    applyFreqToDom();
+    onInput();
+  }
+
   function applyParams() {
     var params = new URLSearchParams(location.search);
     Object.keys(PARAM_KEYS).forEach(function (key) {
@@ -675,6 +733,11 @@
         document.getElementById(PARAM_KEYS[key]).value = value;
       }
     });
+    if (params.has('f') && CODE_FREQ.hasOwnProperty(params.get('f'))) {
+      freq = CODE_FREQ[params.get('f')];
+    }
+    applyFreqToDom();
+    calc();
   }
 
   function copyLink() {
@@ -724,6 +787,8 @@
     Object.keys(DEFAULTS).forEach(function (id) {
       document.getElementById(id).value = DEFAULTS[id];
     });
+    freq = FREQ_DEFAULT;
+    applyFreqToDom();
     calc();
     try { history.replaceState(null, '', location.pathname + location.hash); } catch (e) {}
   }
@@ -746,7 +811,6 @@
   });
 
   applyParams();
-  calc();
 </script>
 </body>
 </html>
